@@ -13,6 +13,9 @@
 			]
 		}
 	},
+	"mounts": [
+		"source=/tools/Xilinx,target=/tools/Xilinx,type=bind"
+	],
 	"remoteUser": "simbricks",
 	"postStartCommand": "sudo chmod o+rw /dev/kvm"
 }

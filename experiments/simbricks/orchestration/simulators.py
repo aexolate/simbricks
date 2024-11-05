@@ -24,6 +24,7 @@
 from __future__ import annotations
 
 import math
+import os
 import typing as tp
 
 from simbricks.orchestration import e2e_components as e2e
@@ -790,6 +791,44 @@ class MultiSubNIC(NICSim):
     def start_delay(self) -> int:
         return 0
 
+
+
+class XsimDev(PCIDevSim):
+    def __init__(
+        self,
+        name: str,
+        tc: str,
+        side: int       # server(0) or client(1)
+    ) -> None:
+        self.name = name
+        self.tc = tc
+        self.side = side
+        super().__init__()
+
+    def resreq_mem(self) -> int:
+        return 2048  # reconic simulation is memory intensive 
+
+    def run_cmd(self, env: ExpEnv) -> str:
+        xsim_workdir = f'{env.workdir}/{self.full_name()}-xsim'
+        os.makedirs(xsim_workdir, exist_ok=True)
+
+        cmds = []
+
+        cmds.append(f'source {os.environ.get("VIVADO_DIR")}/settings64.sh')
+        cmds.append('cd /workspaces/simbricks/sims/external/reconic/sim')
+        cmds.append(
+            f'python run_testcase.py -roce -tc {self.tc} '
+            f'-sb_pcisocket {env.dev_pci_path(self)} '
+            f'-sb_shmpath {env.dev_shm_path(self)} '
+            f'-sb_syncperiod {self.sync_period} '
+            f'-sb_pcilat {self.pci_latency} ' 
+            f'-sb_name {self.name} '
+            f'-sb_side {self.side} '
+        )
+
+        cmd = ' && '.join(cmds)
+
+        return f'bash -c \'{cmd}\''
 
 class I40eMultiNIC(Simulator):
 
