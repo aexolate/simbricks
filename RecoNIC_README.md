@@ -25,10 +25,10 @@ The Vivado software and its required Intellectual Property (IP) licenses must fi
 # command to open the repository inside the container.
 
 # >> SimBricks Setup
-make
+# Replace N with number of cores in the -jN parameter
+make -jN
 git submodule update --init
 
-# Replace N with number of cores in the -jN parameter
 make -jN sims/external/qemu/ready 
 make -jN build-images-min
 make convert-images-raw
@@ -48,6 +48,14 @@ pip install scapy
 
 sudo apt update
 sudo apt install libtinfo5
+
+# Generate Vivado IPs for RecoNIC
+cd /workspaces/simbricks/sims/external/reconic
+git submodule update --init base_nics/open-nic-shell
+cd scripts
+./gen_base_nic.sh
+cd ../sim/scripts
+vivado -mode batch -source gen_vivado_ip.tcl -tclargs -board_repo $BOARD_REPO
 ```
 
 
@@ -56,6 +64,6 @@ sudo apt install libtinfo5
 - The elboration/simulation of RecoNIC using Vivado requires sufficient system memory. Insufficient memory may lead to degraded performance due to swap files, or fatal errors. *Each* xsim simulation may peak to ~10GB of memory usage.
 - If `TimeoutError` occurs, try increasing the timeout duration in `simbricks/orchestration/exectools.py` as the elaboration process may take awhile depending on CPU and Memory availalbe.
 
-In the `experiments` directory, execute `python3 run.py --verbose --force pyexps/reconic.py` to run the RecoNIC experiment. The results can be found in the `/out` folder. Change the `testcase` variable in the python script to run the RDMA WRITE or RDMA READ experiment. 
+In the `experiments` directory (`cd /workspaces/simbricks/experiments`), execute `python3 run.py --verbose --force pyexps/reconic.py` to run the RecoNIC experiment. The results can be found in the `/out` folder. Change the `testcase` variable in the `reconic.py` script to run the RDMA WRITE or RDMA READ experiment. 
 
-For further configuration of the RDMA subsystem or payload, the configuration JSON file can be in `/workspaces/simbricks/sims/external/reconic/sim/testcases/write_2rdma/write_2rdma.json` for the WRITE testcase, and similarly for the READ testcase.
+For further configuration of the RDMA subsystem or payload, the configuration JSON file can be found in `/workspaces/simbricks/sims/external/reconic/sim/testcases/write_2rdma/write_2rdma.json` for the WRITE testcase, and similarly for the READ testcase.
