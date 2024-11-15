@@ -52,6 +52,7 @@ sudo apt install libtinfo5
 # Generate Vivado IPs for RecoNIC
 cd /workspaces/simbricks/sims/external/reconic
 git submodule update --init base_nics/open-nic-shell
+cp -r base_nics/open-nic-shell/board_files/Xilinx/au250 $BOARD_REPO/boards/Xilinx/
 cd scripts
 ./gen_base_nic.sh
 cd ../sim/scripts
