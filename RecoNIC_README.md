@@ -50,12 +50,16 @@ sudo apt update
 sudo apt install libtinfo5
 
 # Generate Vivado IPs for RecoNIC
-cd /workspaces/simbricks/sims/external/reconic
+cd sims/external/reconic
 git submodule update --init base_nics/open-nic-shell
 cp -r base_nics/open-nic-shell/board_files/Xilinx/au250 $BOARD_REPO/boards/Xilinx/
 cd scripts
 ./gen_base_nic.sh
 cd ../sim/scripts
+
+# NOTE: The generation of IPs may fail due to missing licenses, in that case you will need to acquire the required licenses (such as ERNIC or P4 Vitis).
+# If you encounter other errors not related to IPs, try running the vivado command OUTSIDE of dev containers with the PATHs set.
+# export BOARD_REPO=$(pwd)/XilinxBoardStore; export VIVADO_DIR=/tools/Xilinx/Vivado/2021.2; export PATH=$PATH:/tools/Xilinx/Vivado/2021.2/bin; export PATH=$PATH:/tools/Xilinx/Vitis_HLS/2021.2/bin
 vivado -mode batch -source gen_vivado_ip.tcl -tclargs -board_repo $BOARD_REPO
 ```
 
